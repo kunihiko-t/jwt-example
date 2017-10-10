@@ -1,0 +1,45 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.2.0 ()
+  creationTimestamp: null
+  labels:
+    io.kompose.service: app
+  name: app
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: app
+    spec:
+      containers:
+      - args:
+        - bash
+        - -c
+        - go get && go-wrapper run server.go
+        env:
+        - name: GOPATH
+          value: /
+        image: kunihikot/go-alpine-bash:latest
+        name: app
+        volumeMounts:
+          - mountPath:  /src/github.com/kunihiko-t/jwt-example
+            name: repo-volume
+        ports:
+        - containerPort: 8080
+        resources: {}
+        workingDir: /src/github.com/kunihiko-t/jwt-example
+      restartPolicy: Always
+      volumes:
+        - name: repo-volume
+          hostPath:
+            #Replace it with your path
+            path: /Users/kunihikotanaka/dev/docker/jwt
+
+status: {}
